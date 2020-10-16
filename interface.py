@@ -25,8 +25,8 @@ class MyFirstGUI:
         self.tkvar = StringVar(self.master)
 
         # Dictionary with options
-        self.choices = { 'Pizza','Lasagne','Fries','Fish','Potatoe'}
-        self.tkvar.set('Pizza') # set the default option
+        self.choices = sorted([i for i in self.__dir__() if i.startswith("comm_")])
+        self.tkvar.set('comm_search_to') # set the default option
 
         self.popupMenu = OptionMenu(self.master, self.tkvar, *self.choices)
         Label(self.master, text="Choose a command").grid(row = 2, column=0)
@@ -43,7 +43,7 @@ class MyFirstGUI:
         Button(self.master, text="Save buffer", command=self.save_buffer).grid(row=4, column=0)
         
     def insert_text(self):
-        print("insert")
+        print("ins")
         self.buffer.configure(state="normal")
         self.buffer.insert(END, "Hello")
         self.buffer.configure(state="disabled")
@@ -55,6 +55,20 @@ class MyFirstGUI:
     def run(self):
         self.master.mainloop()
 
+    def comm_search_to(self):
+        pass
+
+    def comm_search_to1(self):
+        pass
+
+    def comm_search_to2(self):
+        pass
+
+    def comm_search_to3(self):
+        pass
+
+    def comm_search_to4(self):
+        pass
 
 
 
