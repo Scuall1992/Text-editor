@@ -43,7 +43,10 @@ class MyFirstGUI:
         Button(self.master, text="Save buffer", command=self.save_buffer).grid(row=4, column=0)
         
     def insert_text(self):
+        print("insert")
+        self.buffer.configure(state="normal")
         self.buffer.insert(END, "Hello")
+        self.buffer.configure(state="disabled")
 
 
     def save_buffer(self):
