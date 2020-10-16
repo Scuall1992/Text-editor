@@ -1,4 +1,4 @@
-from front import window
+from interface import window
 
 if __name__ == "__main__":
     window.mainloop()
