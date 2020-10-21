@@ -1,4 +1,4 @@
-from interface import window
+from interface import *
 
 if __name__ == "__main__":
-    window.mainloop()
+    MyFirstGUI(Tk()).run()
