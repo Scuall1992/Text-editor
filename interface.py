@@ -7,11 +7,18 @@ class MyFirstGUI:
     def __init__(self, master):
         self.master = master
 
-
-        self.begin_pointer = 0
-        self.end_pointer = 0
-
+        self.begin_pointer = IntVar(master)
+        self.end_pointer = IntVar(master)
                 
+        self.begin_pointer.set(0)
+        self.end_pointer.set(0)
+
+        self.pointers_label = StringVar(master)
+        self.pointers_label.set(f"begin={self.begin_pointer.get()}     end={self.end_pointer.get()}")
+
+        self.begin_pointer.trace_add("write", self.update_label)
+        self.end_pointer.trace_add("write", self.update_label)
+
         self.master.title("Text editor")
         self.master.geometry("800x600")
 
@@ -26,7 +33,7 @@ class MyFirstGUI:
         self.label_input_word.grid(row=1, column=0)
         self.input_word.grid(row=1, column=1)
 
-        self.pointers = Label(master, text=f"begin={self.begin_pointer}     end={self.end_pointer}")
+        self.pointers = Label(master, textvariable=self.pointers_label)
         self.pointers.grid(row=1, column=2)
         # Create a Tkinter variable
         self.selected_func = StringVar(self.master)
@@ -39,19 +46,14 @@ class MyFirstGUI:
         Label(self.master, text="Choose a command").grid(row = 2, column=0)
         self.popupMenu.grid(row = 2, column=1)
 
-        # # on change dropdown value
-        # def change_dropdown(*args):
-        #     print( self.selected_func.get() )
-
-        # link function to change dropdown
-        # self.selected_func.trace('w', change_dropdown)
-
         Button(self.master, text="Run command", command=self.do_command).grid(row=2, column=2)
         Button(self.master, text="Save buffer", command=self.save_buffer).grid(row=4, column=0)
         
+    def update_label(self, *args):
+        self.pointers_label.set(f"begin={self.begin_pointer.get()}     end={self.end_pointer.get()}")
+
     def do_command(self):
         name = self.selected_func.get()
-
         getattr(self, name)()
 
     def save_buffer(self):
@@ -59,6 +61,10 @@ class MyFirstGUI:
 
     def run(self):
         self.master.mainloop()
+
+    def set_textarea(self, value):
+        self.textarea.delete(1.0, END)
+        self.textarea.insert(END, value)
 
     def run_search_to_word(self):
         s = self.textarea.get("1.0",END)
@@ -68,15 +74,20 @@ class MyFirstGUI:
         if res is None:
             print(self.selected_func.get(), "error")
             return
-        print(self.selected_func.get())
+        
+        self.begin_pointer.set(res[0])
+        self.end_pointer.set(res[1])
+        
 
     def run_forward_word(self):
         s = self.textarea.get("1.0",END)
-        res = funcs[self.selected_func.get()](s, self.begin_pointer)
+        res = funcs[self.selected_func.get()](s, self.begin_pointer.get())
         if res is None:
             print(self.selected_func.get(), "error")
             return
-        print(self.selected_func.get())
+        
+        self.begin_pointer.set(res[0])
+        self.end_pointer.set(res[1])
 
     def run_delete_by_text(self):
         s = self.textarea.get("1.0",END)
@@ -85,28 +96,36 @@ class MyFirstGUI:
         if res is None:
             print(self.selected_func.get(), "error")
             return
-        print(self.selected_func.get())
+        
+        self.set_textarea(res)
+        self.begin_pointer.set(0)
+        self.end_pointer.set(0)
 
     def run_delete_by_pointers(self):
         s = self.textarea.get("1.0",END)
-        res = funcs[self.selected_func.get()](s, self.begin_pointer, self.end_pointer)
+        res = funcs[self.selected_func.get()](s, self.begin_pointer.get(), self.end_pointer.get())
         if res is None:
             print(self.selected_func.get(), "error")
             return
-        print(self.selected_func.get())
+        
+        self.set_textarea(res)
+        self.begin_pointer.set(0)
+        self.end_pointer.set(0)
 
     def run_add_at_begin(self):
         s = self.textarea.get("1.0",END)
         text = self.input_word.get()
-        res = funcs[self.selected_func.get()](s, self.begin_pointer, text)
+        res = funcs[self.selected_func.get()](s, self.begin_pointer.get(), text)
         if res is None:
             print(self.selected_func.get(), "error")
             return
-        print(self.selected_func.get())
-
+        
+        self.set_textarea(res[0])
+        self.begin_pointer.set(res[1])
+        
     def run_copy_to_buffer(self):
         s = self.textarea.get("1.0",END)
-        res = funcs[self.selected_func.get()](s, self.begin_pointer, self.end_pointer)
+        res = funcs[self.selected_func.get()](s, self.begin_pointer.get(), self.end_pointer.get())
         
         if res is None:
             print(self.selected_func.get(), "error")
@@ -116,15 +135,5 @@ class MyFirstGUI:
         self.buffer.insert(END, res)
         self.buffer.configure(state="disabled")
 
-    
-
-
-
-
-'''
-где курсор
-длина текста
-
-'''
 
 MyFirstGUI(Tk()).run()

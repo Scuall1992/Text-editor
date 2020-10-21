@@ -1,7 +1,12 @@
 from typing import Tuple, Optional
 
 def run_search_to_word(s: str, text: str) -> Optional[Tuple[int, int]]: 
-    pass
+    begin = s.find(text)
+    if begin == -1:
+        return None
+
+    end = begin + len(text)
+    return begin, end
 
 def run_forward_word(s: str, begin: int) -> Optional[Tuple[int, int]]:
     pass
@@ -10,7 +15,7 @@ def run_delete_by_text(s: str, text: str) -> Optional[str]:
     pass
 
 def run_delete_by_pointers(s: str, begin: int, end: int) -> Optional[str]:
-    pass
+    return s[:begin] + s[end:]
 
 def run_add_at_begin(s: str, begin: int, text: str) -> Optional[Tuple[str, int]]:
     pass
