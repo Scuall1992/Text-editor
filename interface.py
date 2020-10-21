@@ -46,20 +46,13 @@ class MyFirstGUI:
         # link function to change dropdown
         # self.selected_func.trace('w', change_dropdown)
 
-        Button(self.master, text="Run command", command=self.run_func).grid(row=2, column=2)
+        Button(self.master, text="Run command", command=self.do_command).grid(row=2, column=2)
         Button(self.master, text="Save buffer", command=self.save_buffer).grid(row=4, column=0)
         
-    def run_func(self):
+    def do_command(self):
         name = self.selected_func.get()
-        
+
         getattr(self, name)()
-
-        
-
-        # self.buffer.configure(state="normal")
-        # self.buffer.insert(END, "Hello")
-        # self.buffer.configure(state="disabled")
-
 
     def save_buffer(self):
         print(self.buffer.get("1.0",END))
@@ -68,28 +61,60 @@ class MyFirstGUI:
         self.master.mainloop()
 
     def run_search_to_word(self):
-        res = funcs[self.selected_func.get()](self.textarea.get("1.0",END))
+        s = self.textarea.get("1.0",END)
+        text = self.input_word.get()
+        
+        res = funcs[self.selected_func.get()](s, text)
+        if res is None:
+            print(self.selected_func.get(), "error")
+            return
         print(self.selected_func.get())
 
     def run_forward_word(self):
-        res = funcs[self.selected_func.get()](self.textarea.get("1.0",END))
+        s = self.textarea.get("1.0",END)
+        res = funcs[self.selected_func.get()](s, self.begin_pointer)
+        if res is None:
+            print(self.selected_func.get(), "error")
+            return
         print(self.selected_func.get())
 
     def run_delete_by_text(self):
-        res = funcs[self.selected_func.get()](self.textarea.get("1.0",END))
+        s = self.textarea.get("1.0",END)
+        text = self.input_word.get()
+        res = funcs[self.selected_func.get()](s, text)
+        if res is None:
+            print(self.selected_func.get(), "error")
+            return
         print(self.selected_func.get())
 
     def run_delete_by_pointers(self):
-        res = funcs[self.selected_func.get()](self.textarea.get("1.0",END))
+        s = self.textarea.get("1.0",END)
+        res = funcs[self.selected_func.get()](s, self.begin_pointer, self.end_pointer)
+        if res is None:
+            print(self.selected_func.get(), "error")
+            return
         print(self.selected_func.get())
 
     def run_add_at_begin(self):
-        res = funcs[self.selected_func.get()](self.textarea.get("1.0",END))
+        s = self.textarea.get("1.0",END)
+        text = self.input_word.get()
+        res = funcs[self.selected_func.get()](s, self.begin_pointer, text)
+        if res is None:
+            print(self.selected_func.get(), "error")
+            return
         print(self.selected_func.get())
 
     def run_copy_to_buffer(self):
-        res = funcs[self.selected_func.get()](self.textarea.get("1.0",END))
-        print(self.selected_func.get())
+        s = self.textarea.get("1.0",END)
+        res = funcs[self.selected_func.get()](s, self.begin_pointer, self.end_pointer)
+        
+        if res is None:
+            print(self.selected_func.get(), "error")
+            return
+        
+        self.buffer.configure(state="normal")
+        self.buffer.insert(END, res)
+        self.buffer.configure(state="disabled")
 
     
 
