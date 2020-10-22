@@ -35,7 +35,7 @@ class MyFirstGUI:
 
         self.pointers = Label(master, textvariable=self.pointers_label)
         self.pointers.grid(row=1, column=2)
-        # Create a Tkinter variable
+        
         self.selected_func = StringVar(self.master)
 
         # Dictionary with options
