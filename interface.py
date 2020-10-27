@@ -1,6 +1,8 @@
 from tkinter import *
-from tkinter import scrolledtext
+from tkinter import scrolledtext, filedialog
 from library import funcs
+import os
+from sys import platform
 
 v_lesu = '''В осеннем лесу
 Я рад предстоящей встрече с осенним лесом. Иду как в картинную галерею еще раз взглянуть на знакомые полотна, что ежегодно выставляет напоказ золотая осень. Глаз насторожен и жаден: не хочется ничего упустить.
@@ -28,7 +30,7 @@ class MyFirstGUI:
         self.end_pointer.trace_add("write", self.update_label)
 
         self.master.title("Text editor")
-        self.master.geometry("800x600")
+        self.master.geometry("800x650")
 
         self.textarea = scrolledtext.ScrolledText(
             self.master, width=99, height=20)
@@ -45,6 +47,11 @@ class MyFirstGUI:
 
         self.pointers = Label(master, textvariable=self.pointers_label)
         self.pointers.grid(row=1, column=2)
+
+        self.status_var  = StringVar(self.master)
+        self.status_var.set("Status line")
+        self.status_line = Label(master, textvariable=self.status_var)
+        self.status_line.grid(row=6, column=0)
 
         self.selected_func = StringVar(self.master)
 
@@ -77,8 +84,25 @@ class MyFirstGUI:
         name = self.selected_func.get()
         getattr(self, name)()
 
+    def get_path_to_desktop(self):
+        if platform == "windows":
+            return f"C:\\Users\\{os.getlogin()}\\Desktop"
+        else:
+            return f"~/Desktop/"
+
+    def file_save(self, text2save):
+        f = filedialog.asksaveasfile(initialdir = self.get_path_to_desktop(),title = "Select file",filetypes = [("txt files","*.txt")], mode="w")
+        if f is None:
+            return
+        f.write(text2save)
+        f.close()
+
     def save_buffer(self):
-        print(self.buffer.get("1.0", END))
+        s = self.buffer.get("1.0", END).strip()
+        if len(s) > 0:
+            self.file_save(s)
+        else:
+            self.status_var.set("Empty buffer. Nothing to save")
 
     def run(self):
         self.master.mainloop()
@@ -93,57 +117,62 @@ class MyFirstGUI:
 
         res = funcs[self.selected_func.get()](s, text)
         if res is None:
-            print(self.selected_func.get(), "error")
+            self.status_var.set(f"{self.selected_func.get()} error")
             return
 
         self.begin_pointer.set(res[0])
         self.end_pointer.set(res[1])
+        self.status_var.set(f"{self.selected_func.get()} ok")
 
     def run_forward_word(self):
         s = self.textarea.get("1.0", END)
         res = funcs[self.selected_func.get()](s, self.begin_pointer.get())
         if res is None:
-            print(self.selected_func.get(), "error")
+            self.status_var.set(self.selected_func.get())
             return
 
         if res != -1:
             self.begin_pointer.set(res[0])
             self.end_pointer.set(res[1])
+            self.status_var.set(f"{self.selected_func.get()} ok")
 
     def run_backward_word(self):
         s = self.textarea.get("1.0", END)
         res = funcs[self.selected_func.get()](s, self.begin_pointer.get())
         if res is None:
-            print(self.selected_func.get(), "error")
+            self.status_var.set(self.selected_func.get())
             return
 
         if res != -1:
             self.begin_pointer.set(res[0])
             self.end_pointer.set(res[1])
+            self.status_var.set(f"{self.selected_func.get()} ok")
 
     def run_delete_by_text(self):
         s = self.textarea.get("1.0", END)
         text = self.input_word.get()
         res = funcs[self.selected_func.get()](s, text)
         if res is None:
-            print(self.selected_func.get(), "error")
+            self.status_var.set(self.selected_func.get())
             return
 
         self.set_textarea(res)
         self.begin_pointer.set(0)
         self.end_pointer.set(0)
+        self.status_var.set(f"{self.selected_func.get()} ok")
 
     def run_delete_by_pointers(self):
         s = self.textarea.get("1.0", END)
         res = funcs[self.selected_func.get()](
             s, self.begin_pointer.get(), self.end_pointer.get())
         if res is None:
-            print(self.selected_func.get(), "error")
+            self.status_var.set(self.selected_func.get())
             return
 
         self.set_textarea(res)
         self.begin_pointer.set(0)
         self.end_pointer.set(0)
+        self.status_var.set(f"{self.selected_func.get()} ok")
 
     def run_add_before(self):
         s = self.textarea.get("1.0", END)
@@ -151,11 +180,12 @@ class MyFirstGUI:
         res = funcs[self.selected_func.get()](
             s, self.begin_pointer.get(), text)
         if res is None:
-            print(self.selected_func.get(), "error")
+            self.status_var.set(self.selected_func.get())
             return
 
         self.set_textarea(res[0])
         self.begin_pointer.set(res[1])
+        self.status_var.set(f"{self.selected_func.get()} ok")
 
     def run_add_after(self):
         s = self.textarea.get("1.0", END)
@@ -163,11 +193,12 @@ class MyFirstGUI:
         res = funcs[self.selected_func.get()](
             s, self.begin_pointer.get(), text)
         if res is None:
-            print(self.selected_func.get(), "error")
+            self.status_var.set(self.selected_func.get())
             return
 
         self.set_textarea(res[0])
         self.begin_pointer.set(res[1])
+        self.status_var.set(f"{self.selected_func.get()} ok")
 
     def run_copy_to_buffer(self):
         s = self.textarea.get("1.0", END)
@@ -175,7 +206,7 @@ class MyFirstGUI:
             s, self.begin_pointer.get(), self.end_pointer.get())
 
         if res is None:
-            print(self.selected_func.get(), "error")
+            self.status_var.set(self.selected_func.get())
             return
 
         if len(self.buffer.get(1.0, END)) == 0:
@@ -184,6 +215,6 @@ class MyFirstGUI:
         self.buffer.configure(state="normal")
         self.buffer.insert(END, res)
         self.buffer.configure(state="disabled")
-
+        self.status_var.set(f"{self.selected_func.get()} ok")
 
 MyFirstGUI(Tk()).run()

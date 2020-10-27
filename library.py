@@ -34,11 +34,13 @@ def run_backward_word(s: str, begin: int) -> Optional[Tuple[str, int]]:
 
 
 def run_delete_by_text(s: str, text: str) -> Optional[str]:
-    pass
+    if text not in s:
+        return None
+    return s.replace(text, "")
 
 
 def run_delete_by_pointers(s: str, begin: int, end: int) -> Optional[str]:
-    return s[:begin] + s[end+1:]
+    return s[:begin] + s[end:]
 
 
 def run_add_before(s: str, begin: int, text: str) -> Optional[Tuple[str, int]]:
